@@ -103,7 +103,11 @@ class ChatRoot extends BaseChat {
   }
 }
 
-class ChatWindow extends React.Component {
+class ChatWindow extends BaseChat {
+  constructor(props) {
+    super(props);
+  }
+
   render() {
     console.log("ChatWindow.State durumu:", this.state);
     console.log("ChatWindow.Props durumu:", this.props);
