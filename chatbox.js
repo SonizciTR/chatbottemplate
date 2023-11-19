@@ -18,37 +18,32 @@ const chatboxopened = {
   height: "95%",
 };
 
-class BaseChat extends React.Component {
-  constructor(props) {
-    super(props);
-  }
+const callBackendPost = (url_to_call, callback_func, body = "") => {
+  var full_url = url_backend_base + url_to_call;
+  var req = new XMLHttpRequest();
 
-  callBackend(url_to_call, callback_func) {
-    var full_url = url_backend_base + url_to_call;
-    var req = new XMLHttpRequest();
+  req.open("POST", full_url);
+  req.setRequestHeader("Content-type", "application/json");
+  req.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+  req.setRequestHeader("Access-Control-Allow-Origin", "*");
 
-    req.open("POST", full_url);
-    req.setRequestHeader("Content-type", "application/json");
-    req.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-    req.setRequestHeader("Access-Control-Allow-Origin", "*");
+  req.onreadystatechange = function (aEvt) {
+    if (req.readyState == 4) {
+      if (req.status == 200) {
+        console.log("callBackend.web cagrisi =>", req.responseText);
+        console.log("callBackend.web callback_func =>", callback_func);
 
-    req.onreadystatechange = function (aEvt) {
-      if (req.readyState == 4) {
-        if (req.status == 200) {
-          console.log("callBackend.web cagrisi =>", req.responseText);
-          console.log("callBackend.web callback_func =>", callback_func);
-
-          callback_func(JSON.parse(req.responseText));
-        } else alert("Error loading page\n");
-      }
-    };
-    req.send();
-  }
-}
+        callback_func(JSON.parse(req.responseText));
+      } else alert("Error loading page\n");
+    }
+  };
+  console.log("body =>", body);
+  req.send(body);
+};
 
 ////////////////////////////////////////////////
 
-class ChatRoot extends BaseChat {
+class ChatRoot extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -62,7 +57,10 @@ class ChatRoot extends BaseChat {
 
   componentDidMount() {
     //this.getData();
-    this.callBackend("chatconfig", (data) => this.setConfig(data));
+    var channelVal = this.props.myinput;
+    callBackendPost("chatconfig", (data) => this.setConfig(data), {
+      channel: channelVal,
+    });
   }
   ////////////////////////////////////////////////
 
@@ -103,7 +101,7 @@ class ChatRoot extends BaseChat {
   }
 }
 
-class ChatWindow extends BaseChat {
+class ChatWindow extends React.Component {
   constructor(props) {
     super(props);
   }
