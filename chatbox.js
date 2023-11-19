@@ -102,7 +102,10 @@ class ChatRoot extends React.Component {
     if (this.state.isOpened) {
       return (
         <>
-          <ChatWindow Configs={this.state.configs} />
+          <ChatWindow
+            Configs={this.state.configs}
+            ClickMinize={this.toggleChatWindow}
+          />
         </>
       );
     }
@@ -131,14 +134,14 @@ const styleChildTopPart = {
   backgroundColor: "red",
   //margin: "auto",
   width: "100%",
-  height: "5%",
+  height: "30px",
 };
 
 const styleChildMiddlePart = {
   backgroundColor: "green",
   //margin: "auto",
   width: "100%",
-  height: "80%",
+  height: "100%",
 };
 
 const styleChildBottomPart = {
@@ -146,7 +149,7 @@ const styleChildBottomPart = {
   //margin: "auto",
   bottom: "10px",
   width: "100%",
-  height: "15%",
+  height: "100px",
 };
 
 const styleDivCommon = {
@@ -167,9 +170,10 @@ class ChatWindow extends React.Component {
         <table style={styleMainContainer}>
           <tr style={styleChildTopPart}>
             <td>
-              <div id="topPart" style={styleDivCommon}>
-                <h1>Top Part</h1>
-              </div>
+              <ChatWindowTopPart
+                Configs={this.props.Configs}
+                ClickMinize={this.props.ClickMinize}
+              />
             </td>
           </tr>
           <tr style={styleChildMiddlePart}>
@@ -187,6 +191,36 @@ class ChatWindow extends React.Component {
             </td>
           </tr>
         </table>
+      </div>
+    );
+  }
+}
+
+/////////////////////////////////////////////////////////
+const styleTopImg = {
+  width: "24px",
+  height: "24px",
+  position: "absolute",
+  top: "6px",
+  right: "10px",
+  cursor: "pointer",
+};
+class ChatWindowTopPart extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  /////
+
+  render() {
+    return (
+      <div>
+        <span>{this.props.Configs.textHeader}</span>
+        <img
+          src="data:image/png;base64,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"
+          alt="Minimize"
+          style={styleTopImg}
+          onClick={this.props.ClickMinize}
+        />
       </div>
     );
   }
