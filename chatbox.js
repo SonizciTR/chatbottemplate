@@ -185,9 +185,7 @@ class ChatWindow extends React.Component {
           </tr>
           <tr style={styleChildBottomPart}>
             <td>
-              <div id="bottomPart" style={styleDivCommon}>
-                <h1>Bottom Part</h1>
-              </div>
+              <ChatWindowBottomPart />
             </td>
           </tr>
         </table>
@@ -226,6 +224,38 @@ class ChatWindowTopPart extends React.Component {
   }
 }
 
+/////////////////////////////////////////////////////////
+const styleBottomPartText = {
+  width: "85%",
+  height: "100%",
+};
+
+const styleBottomPartImg = {
+  width: "32px",
+  height: "100%",
+};
+
+class ChatWindowBottomPart extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  /////
+
+  render() {
+    return (
+      <div>
+        <textarea id="w3review" name="w3review" style={styleBottomPartText} />
+        <img
+          alt="Enter"
+          style={styleBottomPartImg}
+          src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iODAwcHgiIGhlaWdodD0iODAwcHgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4KICAgIDwhLS0gVXBsb2FkZWQgdG86IFNWRyBSZXBvLCB3d3cuc3ZncmVwby5jb20sIEdlbmVyYXRvcjogU1ZHIFJlcG8gTWl4ZXIgVG9vbHMgLS0+CiAgICA8dGl0bGU+aWNfZmx1ZW50X2Fycm93X2VudGVyXzI0X2ZpbGxlZDwvdGl0bGU+CiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggU2tldGNoLjwvZGVzYz4KICAgIDxnIGlkPSLwn5SNLVN5c3RlbS1JY29ucyIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGcgaWQ9ImljX2ZsdWVudF9hcnJvd19lbnRlcl8yNF9maWxsZWQiIGZpbGw9IiMyMTIxMjEiIGZpbGwtcnVsZT0ibm9uemVybyI+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik0yMSw0IEMyMS41MTI4MzU4LDQgMjEuOTM1NTA3Miw0LjM4NjA0MDE5IDIxLjk5MzI3MjMsNC44ODMzNzg4NyBMMjIsNSBMMjIsMTEuNSBDMjIsMTMuMzY4NTYzNCAyMC41MzU3MjI0LDE0Ljg5NTEyNjQgMTguNjkyMDM1MiwxNC45OTQ4MjExIEwxOC41LDE1IEw1LjQxNSwxNSBMOC43MDcxMDY3OCwxOC4yOTI4OTMyIEM5LjA2NzU5MDc0LDE4LjY1MzM3NzIgOS4wOTUzMjAyOCwxOS4yMjA2MDgyIDguNzkwMjk1MzksMTkuNjEyODk5NCBMOC43MDcxMDY3OCwxOS43MDcxMDY4IEM4LjM0NjYyMjgyLDIwLjA2NzU5MDcgNy43NzkzOTE3NiwyMC4wOTUzMjAzIDcuMzg3MTAwNTYsMTkuNzkwMjk1NCBMNy4yOTI4OTMyMiwxOS43MDcxMDY4IEwyLjI5Mjg5MzIyLDE0LjcwNzEwNjggQzIuMjU3NDk5MTcsMTQuNjcxNzEyNyAyLjIyNTMxMjk1LDE0LjYzNDMyNTYgMi4xOTYzMzQ1OCwxNC41OTUzMDY2IEwyLjEyNDY3MTE3LDE0LjQ4NDA2MjEgTDIuMTI0NjcxMTcsMTQuNDg0MDYyMSBMMi4wNzEyMjU0OSwxNC4zNzEzMzYgTDIuMDcxMjI1NDksMTQuMzcxMzM2IEwyLjAzNTg0NTE0LDE0LjI2NTk5MyBMMi4wMzU4NDUxNCwxNC4yNjU5OTMgTDIuMDExMDE3OCwxNC4xNDg0NjY5IEwyLjAxMTAxNzgsMTQuMTQ4NDY2OSBMMi4wMDM5Nzc0OCwxNC4wODk4MDE4IEwyLjAwMzk3NzQ4LDE0LjA4OTgwMTggTDIsMTQgTDIuMDAyNzg3ODYsMTMuOTI0NzYxNSBMMi4wMDI3ODc4NiwxMy45MjQ3NjE1IEwyLjAyMDI0MDA3LDEzLjc5OTI3NDIgTDIuMDIwMjQwMDcsMTMuNzk5Mjc0MiBMMi4wNDk3MzgwOSwxMy42ODc4NTc1IEwyLjA0OTczODA5LDEzLjY4Nzg1NzUgTDIuMDkzNjczMzYsMTMuNTc2Nzc4NSBMMi4wOTM2NzMzNiwxMy41NzY3Nzg1IEwyLjE0NTk5NTQ1LDEzLjQ3OTI5MTIgTDIuMTQ1OTk1NDUsMTMuNDc5MjkxMiBMMi4yMDk3MDQ2MSwxMy4zODcxMDA2IEwyLjIwOTcwNDYxLDEzLjM4NzEwMDYgTDIuMjkyODkzMjIsMTMuMjkyODkzMiBMMi4yOTI4OTMyMiwxMy4yOTI4OTMyIEw3LjI5Mjg5MzIyLDguMjkyODkzMjIgQzcuNjgzNDE3NTEsNy45MDIzNjg5MyA4LjMxNjU4MjQ5LDcuOTAyMzY4OTMgOC43MDcxMDY3OCw4LjI5Mjg5MzIyIEM5LjA2NzU5MDc0LDguNjUzMzc3MTggOS4wOTUzMjAyOCw5LjIyMDYwODI0IDguNzkwMjk1MzksOS42MTI4OTk0NCBMOC43MDcxMDY3OCw5LjcwNzEwNjc4IEw1LjQxNSwxMyBMMTguNSwxMyBDMTkuMjc5Njk2MSwxMyAxOS45MjA0NDg3LDEyLjQwNTExMTkgMTkuOTkzMTMzNCwxMS42NDQ0NiBMMjAsMTEuNSBMMjAsNSBDMjAsNC40NDc3MTUyNSAyMC40NDc3MTUzLDQgMjEsNCBaIiBpZD0i8J+OqC1Db2xvciI+Cg08L3BhdGg+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4="
+        />
+      </div>
+    );
+  }
+}
+
+/////////////////////////////////////////////////////////
 // class MyComponent extends React.Component {
 //   render() {
 //     return <div>This is a simple component</div>;
