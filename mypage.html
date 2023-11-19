@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<body style="height: 100%;">
+
+    <h3>My First Heading</h3>
+    <p>My first paragraph.</p>
+    <br />
+
+    <div class="chatbox-area"></div>
+
+    <br />
+    <h3>My 2 Heading</h3>
+    <p>My 2 paragraph.</p>
+    <br />
+    <h3>My 3 Heading</h3>
+    <p>My 3 paragraph.</p>
+
+
+</body>
+
+<!-- <script src="https://unpkg.com/react@16/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js" crossorigin></script> -->
+<script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+
+<script type="text/babel" src="./chatbox.js"></script>
+
+<script type="text/babel">
+    ReactDOM.render(<ChatRoot myinput="1" />, document.querySelector(".chatbox-area"));
+</script>
+
+</html>
