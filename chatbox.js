@@ -1,16 +1,20 @@
+const url_backend_base = "http://localhost:50689/";
+
 function uuidv4() {
-  return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c) =>
-    (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4))))
-      .toString(16)
-      .replace("-", "")
+  var rslt = "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c) =>
+    (
+      c ^
+      (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
+    ).toString(16)
   );
+  return rslt.replaceAll("-", "");
 }
 
-const url_backend_base = "http://localhost:50689/";
 const cUserUniqueId = uuidv4();
 
 const chatboxminimized = {
   backgroundColor: "purple",
+  borderRadius: "10px",
   position: "absolute",
   bottom: "10px",
   right: "8px",
@@ -31,6 +35,7 @@ const getRequest = (propsInfo) => {
   return {
     channel: propsInfo.channel,
     userUniqueId: cUserUniqueId,
+    requestId: uuidv4(),
   };
 };
 
@@ -46,14 +51,13 @@ const callBackendPost = (url_to_call, callback_func, body = "") => {
   req.onreadystatechange = function (aEvt) {
     if (req.readyState == 4) {
       if (req.status == 200) {
-        console.log("callBackend.web cagrisi =>", req.responseText);
-        console.log("callBackend.web callback_func =>", callback_func);
-
-        callback_func(JSON.parse(req.responseText));
+        let jsn = JSON.parse(req.responseText);
+        console.log("-Response Body =>", jsn);
+        callback_func(jsn);
       } else alert("Error loading page\n");
     }
   };
-  console.log("body =>", body);
+  console.log("-Request Body =>", body);
   if (body) req.send(JSON.stringify(body));
   else req.send(body);
 };
@@ -83,7 +87,6 @@ class ChatRoot extends React.Component {
   ////////////////////////////////////////////////
 
   setConfig(configData) {
-    console.log("**** setConfig tetiklendi", configData);
     this.setState((state) => ({
       configs: configData,
     }));
@@ -93,12 +96,9 @@ class ChatRoot extends React.Component {
     this.setState((state) => ({
       isOpened: !state.isOpened,
     }));
-    console.log("toggleChatWindow Clicked : ", this.state);
   };
 
   render() {
-    console.log("ChatRoot.State durumu:", this.state);
-    console.log("ChatRoot.Props durumu:", this.props);
     if (this.state.isOpened) {
       return (
         <>
@@ -131,7 +131,7 @@ const styleMainContainer = {
 };
 
 const styleChildTopPart = {
-  backgroundColor: "red",
+  //backgroundColor: "red",
   //margin: "auto",
   width: "100%",
   height: "30px",
@@ -216,7 +216,7 @@ class ChatWindowTopPart extends React.Component {
       <div>
         <span>{this.props.Configs.textHeader}</span>
         <img
-          src="data:image/png;base64,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"
+          src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pg0KPCEtLSBVcGxvYWRlZCB0bzogU1ZHIFJlcG8sIHd3dy5zdmdyZXBvLmNvbSwgR2VuZXJhdG9yOiBTVkcgUmVwbyBNaXhlciBUb29scyAtLT4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8c3ZnIGZpbGw9IiMwMDAwMDAiIHZlcnNpb249IjEuMSIgaWQ9IkNhcGFfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgDQoJIHdpZHRoPSI4MDBweCIgaGVpZ2h0PSI4MDBweCIgdmlld0JveD0iMCAwIDQ4MC4yMjEgNDgwLjIyMSINCgkgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8Zz4NCgk8cGF0aCBkPSJNNDgwLjE1OCwyNjAuODc4djE2Ni45NzljMCwyOC44NzQtMjMuNTAxLDUyLjM2My01Mi4zODEsNTIuMzYzSDUyLjQ1M2MtMjguODg5LDAtNTIuMzktMjMuNDg5LTUyLjM5LTUyLjM2M1Y1Mi45MzgNCgkJYzAtMjguODc0LDIzLjUwMS01Mi4zNjksNTIuMzktNTIuMzY5aDE2Ny40MzRjLTkuMDExLDkuMjQ0LTE1LjAwNCwyMS40NS0xNi4zMTYsMzUuMDAzSDUyLjQ0Nw0KCQljLTkuNTgyLDAtMTcuMzc4LDcuNzkxLTE3LjM3OCwxNy4zNjZ2Mzc0LjkyYzAsOS41NjksNy43OTYsMTcuMzYsMTcuMzc4LDE3LjM2aDM3NS4zMjVjOS41ODEsMCwxNy4zNzItNy43OTEsMTcuMzcyLTE3LjM2VjI3Ny4xNjkNCgkJQzQ1OC4zMywyNzUuOTA0LDQ3MC41NiwyNzAuMjM2LDQ4MC4xNTgsMjYwLjg3OHogTTM5OS4yODcsMjMwLjA5NkgyODQuODMxTDQ3MC4wOTksNDQuODI5YzEwLjI0OS0xMC4yNjEsMTAuMjQ5LTI2Ljg4MiwwLTM3LjEzMQ0KCQljLTEwLjI1Ni0xMC4yNjEtMjYuODgzLTEwLjI2MS0zNy4xMzItMC4wMTJMMjQ3LjcsMTkyLjk1OFY3OC40OTdjMC0xNC40OTktMTEuNzU3LTI2LjI2Mi0yNi4yNTktMjYuMjYyDQoJCWMtNy4yNSwwLTEzLjgxNiwyLjkzMi0xOC41NjksNy42ODljLTQuNzUyLDQuNzY1LTcuNjkzLDExLjMyNS03LjY5MywxOC41NzJ2MTc3Ljg1NGMwLDE0LjQ5OSwxMS43NTQsMjYuMjU2LDI2LjI1NiwyNi4yNTZoMTc3Ljg1Mg0KCQljMTQuNTA1LDAsMjYuMjU2LTExLjc1MSwyNi4yNTYtMjYuMjU2UzQxMy43OTIsMjMwLjA5NiwzOTkuMjg3LDIzMC4wOTZ6Ii8+DQo8L2c+DQo8L3N2Zz4="
           alt="Minimize"
           style={styleTopImg}
           onClick={this.props.ClickMinize}
