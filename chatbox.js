@@ -20,6 +20,7 @@ const chatboxminimized = {
   right: "8px",
   width: "64px",
   height: "64px",
+  opacity: 0,
 };
 
 const chatboxopened = {
@@ -29,6 +30,7 @@ const chatboxopened = {
   right: "8px",
   width: "25%",
   height: "95%",
+  opacity: 0,
 };
 
 const getRequest = (propsInfo) => {
