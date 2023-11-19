@@ -101,6 +101,10 @@ class ChatRoot extends React.Component {
     }));
   };
 
+  sendMsgToBackend = (message) => {
+    console.log("sendMsgToBackend teitklendi", message);
+  };
+
   render() {
     if (this.state.isOpened) {
       return (
@@ -108,6 +112,7 @@ class ChatRoot extends React.Component {
           <ChatWindow
             Configs={this.state.configs}
             ClickMinize={this.toggleChatWindow}
+            SendMsgFunc={this.sendMsgToBackend}
           />
         </>
       );
@@ -188,7 +193,7 @@ class ChatWindow extends React.Component {
           </tr>
           <tr style={styleChildBottomPart}>
             <td>
-              <ChatWindowBottomPart />
+              <ChatWindowBottomPart SendMsgFunc={this.props.SendMsgFunc} />
             </td>
           </tr>
         </table>
@@ -241,13 +246,31 @@ const styleBottomPartImg = {
 class ChatWindowBottomPart extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      textEntered: "",
+    };
+    this.handleChange = this.handleChange.bind(this);
   }
   /////
+  handleChange(event) {
+    var tmpVal = event.target.value;
+    console.log("ChatWindowBottomPart.handleChange", tmpVal, event);
+    //this.setState({ textEntered: event.target.value });
+    this.setState((state) => ({
+      textEntered: tmpVal,
+    }));
+  }
 
   render() {
     return (
       <div>
-        <textarea id="w3review" name="w3review" style={styleBottomPartText} />
+        <textarea
+          id="w3review"
+          name="w3review"
+          style={styleBottomPartText}
+          value={this.state.textEntered}
+          onChange={this.handleChange}
+        />
         <img
           alt="Enter"
           style={styleBottomPartImg}
