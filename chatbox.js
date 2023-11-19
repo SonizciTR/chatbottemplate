@@ -1,4 +1,13 @@
+function uuidv4() {
+  return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c) =>
+    (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4))))
+      .toString(16)
+      .replace("-", "")
+  );
+}
+
 const url_backend_base = "http://localhost:50689/";
+const cUserUniqueId = uuidv4();
 
 const chatboxminimized = {
   backgroundColor: "purple",
@@ -16,6 +25,13 @@ const chatboxopened = {
   right: "8px",
   width: "25%",
   height: "95%",
+};
+
+const getRequest = (propsInfo) => {
+  return {
+    channel: propsInfo.channel,
+    userUniqueId: cUserUniqueId,
+  };
 };
 
 const callBackendPost = (url_to_call, callback_func, body = "") => {
@@ -58,9 +74,11 @@ class ChatRoot extends React.Component {
   componentDidMount() {
     //this.getData();
     var channelVal = this.props.myinput;
-    callBackendPost("chatconfig", (data) => this.setConfig(data), {
-      channel: channelVal,
-    });
+    callBackendPost(
+      "chatconfig",
+      (data) => this.setConfig(data),
+      getRequest(this.props)
+    );
   }
   ////////////////////////////////////////////////
 
