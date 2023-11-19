@@ -1,4 +1,4 @@
-const url_backend = "https://dog.ceo/api/breeds/list/all";
+const url_backend_base = "http://localhost:50689/";
 
 const chatboxminimized = {
   backgroundColor: "purple",
@@ -24,8 +24,14 @@ class BaseChat extends React.Component {
   }
 
   callBackend(url_to_call, callback_func) {
+    var full_url = url_backend_base + url_to_call;
     var req = new XMLHttpRequest();
-    req.open("GET", url_to_call);
+
+    req.open("POST", full_url);
+    req.setRequestHeader("Content-type", "application/json");
+    req.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+    req.setRequestHeader("Access-Control-Allow-Origin", "*");
+
     req.onreadystatechange = function (aEvt) {
       if (req.readyState == 4) {
         if (req.status == 200) {
@@ -37,15 +43,6 @@ class BaseChat extends React.Component {
       }
     };
     req.send();
-
-    //var xhr = new XMLHttpRequest();
-    // xhr.addEventListener("load", () => {
-    //   console.log("callBackend.web cagrisi =>", xhr.responseText);
-
-    //   callback_func(JSON.parse(xhr.responseText));
-    // });
-    // xhr.open("GET", url_to_call);
-    // xhr.send();
   }
 }
 
@@ -56,13 +53,16 @@ class ChatRoot extends BaseChat {
     super(props);
     this.state = {
       isOpened: false,
-      configs: {},
+      configs: {
+        styleMinimized: chatboxminimized,
+        styleMaximized: chatboxopened,
+      },
     };
   }
 
   componentDidMount() {
     //this.getData();
-    this.callBackend(url_backend, (data) => this.setConfig(data));
+    this.callBackend("chatconfig", (data) => this.setConfig(data));
   }
   ////////////////////////////////////////////////
 
@@ -71,25 +71,6 @@ class ChatRoot extends BaseChat {
     this.setState((state) => ({
       configs: configData,
     }));
-  }
-
-  getData() {
-    // create a new XMLHttpRequest
-    var xhr = new XMLHttpRequest();
-
-    // get a callback when the server responds
-    xhr.addEventListener("load", () => {
-      // update the state of the component with the result here
-      console.log("web cagrisi:", xhr.responseText);
-
-      this.setState((state) => ({
-        configs: JSON.parse(xhr.responseText),
-      }));
-    });
-    // open the request with the verb and the url
-    xhr.open("GET", url_backend);
-    // send the request
-    xhr.send();
   }
 
   toggleChatWindow = () => {
@@ -105,7 +86,7 @@ class ChatRoot extends BaseChat {
     if (this.state.isOpened) {
       return (
         <>
-          <ChatWindow Configs={chatboxopened} />
+          <ChatWindow Configs={this.state.configs} />
         </>
       );
     }
@@ -114,7 +95,7 @@ class ChatRoot extends BaseChat {
         <img
           src="chaticon.png"
           alt="Want to chat"
-          style={chatboxminimized}
+          style={this.state.configs.styleMinimized}
           onClick={this.toggleChatWindow}
         />
       </>
@@ -126,7 +107,7 @@ class ChatWindow extends React.Component {
   render() {
     console.log("ChatWindow.State durumu:", this.state);
     console.log("ChatWindow.Props durumu:", this.props);
-    return <div style={this.props.Configs}>Chat Window</div>;
+    return <div style={this.props.Configs.styleMaximized}>Chat Window</div>;
   }
 }
 
