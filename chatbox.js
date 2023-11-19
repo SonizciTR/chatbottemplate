@@ -54,7 +54,8 @@ const callBackendPost = (url_to_call, callback_func, body = "") => {
     }
   };
   console.log("body =>", body);
-  req.send(body);
+  if (body) req.send(JSON.stringify(body));
+  else req.send(body);
 };
 
 ////////////////////////////////////////////////
@@ -72,7 +73,6 @@ class ChatRoot extends React.Component {
   }
 
   componentDidMount() {
-    //this.getData();
     var channelVal = this.props.myinput;
     callBackendPost(
       "chatconfig",
@@ -97,8 +97,8 @@ class ChatRoot extends React.Component {
   };
 
   render() {
-    console.log("ChatBox.State durumu:", this.state);
-    console.log("ChatBox.Props durumu:", this.props);
+    console.log("ChatRoot.State durumu:", this.state);
+    console.log("ChatRoot.Props durumu:", this.props);
     if (this.state.isOpened) {
       return (
         <>
@@ -119,6 +119,41 @@ class ChatRoot extends React.Component {
   }
 }
 
+////////////////////////////////////////////////
+const styleMainContainer = {
+  // display: "flex",
+  // "flex-direction": "column",
+  width: "100%",
+  height: "100%",
+};
+
+const styleChildTopPart = {
+  backgroundColor: "red",
+  //margin: "auto",
+  width: "100%",
+  height: "5%",
+};
+
+const styleChildMiddlePart = {
+  backgroundColor: "green",
+  //margin: "auto",
+  width: "100%",
+  height: "80%",
+};
+
+const styleChildBottomPart = {
+  backgroundColor: "grey",
+  //margin: "auto",
+  bottom: "10px",
+  width: "100%",
+  height: "15%",
+};
+
+const styleDivCommon = {
+  width: "100%",
+  height: "100%",
+};
+
 class ChatWindow extends React.Component {
   constructor(props) {
     super(props);
@@ -129,15 +164,29 @@ class ChatWindow extends React.Component {
     console.log("ChatWindow.Props durumu:", this.props);
     return (
       <div style={this.props.Configs.styleMaximized}>
-        <div id="topPart">
-          <h1>Top Part</h1>
-        </div>
-        <div id="middlePart">
-          <h1>Middle Part</h1>
-        </div>
-        <div id="bottomPart">
-          <h1>Bottom Part</h1>
-        </div>
+        <table style={styleMainContainer}>
+          <tr style={styleChildTopPart}>
+            <td>
+              <div id="topPart" style={styleDivCommon}>
+                <h1>Top Part</h1>
+              </div>
+            </td>
+          </tr>
+          <tr style={styleChildMiddlePart}>
+            <td>
+              <div id="middlePart" style={styleDivCommon}>
+                <h1>Middle Part</h1>
+              </div>
+            </td>
+          </tr>
+          <tr style={styleChildBottomPart}>
+            <td>
+              <div id="bottomPart" style={styleDivCommon}>
+                <h1>Bottom Part</h1>
+              </div>
+            </td>
+          </tr>
+        </table>
       </div>
     );
   }
