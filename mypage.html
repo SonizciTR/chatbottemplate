@@ -7,7 +7,7 @@
     <p>My first paragraph.</p>
     <br />
 
-    <div class="chatbox-area"></div>
+    <div id="chatbox-area"></div>
 
     <br />
     <h3>My 2 Heading</h3>
@@ -30,7 +30,7 @@
 <script type="text/babel" src="./chatbox.js"></script>
 
 <script type="text/babel">
-    ReactDOM.render(<ChatRoot channel="1" />, document.querySelector(".chatbox-area"));
+    ReactDOM.render(<ChatRoot channel="1" />, document.getElementById("chatbox-area"));
 </script>
 
 </html>
