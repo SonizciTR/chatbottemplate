@@ -1,6 +1,6 @@
 const url_backend = "https://dog.ceo/api/breeds/list/all";
 
-const chatboxmerged = {
+const chatboxminimized = {
   backgroundColor: "purple",
   position: "absolute",
   bottom: "10px",
@@ -9,9 +9,49 @@ const chatboxmerged = {
   height: "64px",
 };
 
+const chatboxopened = {
+  backgroundColor: "yellow",
+  position: "absolute",
+  bottom: "10px",
+  right: "8px",
+  width: "25%",
+  height: "95%",
+};
+
+class BaseChat extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  callBackend(url_to_call, callback_func) {
+    var req = new XMLHttpRequest();
+    req.open("GET", url_to_call);
+    req.onreadystatechange = function (aEvt) {
+      if (req.readyState == 4) {
+        if (req.status == 200) {
+          console.log("callBackend.web cagrisi =>", req.responseText);
+          console.log("callBackend.web callback_func =>", callback_func);
+
+          callback_func(JSON.parse(req.responseText));
+        } else alert("Error loading page\n");
+      }
+    };
+    req.send();
+
+    //var xhr = new XMLHttpRequest();
+    // xhr.addEventListener("load", () => {
+    //   console.log("callBackend.web cagrisi =>", xhr.responseText);
+
+    //   callback_func(JSON.parse(xhr.responseText));
+    // });
+    // xhr.open("GET", url_to_call);
+    // xhr.send();
+  }
+}
+
 ////////////////////////////////////////////////
 
-class ChatRoot extends React.Component {
+class ChatRoot extends BaseChat {
   constructor(props) {
     super(props);
     this.state = {
@@ -21,12 +61,17 @@ class ChatRoot extends React.Component {
   }
 
   componentDidMount() {
-    // call api or anything
-    console.log("ChatBox.componentDidMount has been rendered");
-
-    this.getData();
+    //this.getData();
+    this.callBackend(url_backend, (data) => this.setConfig(data));
   }
   ////////////////////////////////////////////////
+
+  setConfig(configData) {
+    console.log("**** setConfig tetiklendi", configData);
+    this.setState((state) => ({
+      configs: configData,
+    }));
+  }
 
   getData() {
     // create a new XMLHttpRequest
@@ -60,7 +105,7 @@ class ChatRoot extends React.Component {
     if (this.state.isOpened) {
       return (
         <>
-          <ChatWindow />
+          <ChatWindow Configs={chatboxopened} />
         </>
       );
     }
@@ -69,7 +114,7 @@ class ChatRoot extends React.Component {
         <img
           src="chaticon.png"
           alt="Want to chat"
-          style={chatboxmerged}
+          style={chatboxminimized}
           onClick={this.toggleChatWindow}
         />
       </>
@@ -81,7 +126,7 @@ class ChatWindow extends React.Component {
   render() {
     console.log("ChatWindow.State durumu:", this.state);
     console.log("ChatWindow.Props durumu:", this.props);
-    return <h1>Chat Window</h1>;
+    return <div style={this.props.Configs}>Chat Window</div>;
   }
 }
 
