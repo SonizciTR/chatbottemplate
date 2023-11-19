@@ -111,7 +111,19 @@ class ChatWindow extends BaseChat {
   render() {
     console.log("ChatWindow.State durumu:", this.state);
     console.log("ChatWindow.Props durumu:", this.props);
-    return <div style={this.props.Configs.styleMaximized}>Chat Window</div>;
+    return (
+      <div style={this.props.Configs.styleMaximized}>
+        <div id="topPart">
+          <h1>Top Part</h1>
+        </div>
+        <div id="middlePart">
+          <h1>Middle Part</h1>
+        </div>
+        <div id="bottomPart">
+          <h1>Bottom Part</h1>
+        </div>
+      </div>
+    );
   }
 }
 
