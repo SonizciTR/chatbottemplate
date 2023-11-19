@@ -13,7 +13,7 @@ function uuidv4() {
 const cUserUniqueId = uuidv4();
 
 const chatboxminimized = {
-  backgroundColor: "purple",
+  backgroundColor: "transparent",
   borderRadius: "10px",
   position: "absolute",
   bottom: "10px",
