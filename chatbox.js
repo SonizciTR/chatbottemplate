@@ -1,4 +1,4 @@
-const url_backend_base = "http://localhost:50689/";
+const url_backend_base = "http://localhost:10718/";
 
 function uuidv4() {
   var rslt = "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c) =>
@@ -15,7 +15,7 @@ const cUserUniqueId = uuidv4();
 const chatboxminimized = {
   backgroundColor: "transparent",
   borderRadius: "10px",
-  position: "absolute",
+  position: "fixed",
   bottom: "10px",
   right: "8px",
   width: "64px",
@@ -24,8 +24,8 @@ const chatboxminimized = {
 };
 
 const chatboxopened = {
-  backgroundColor: "yellow",
-  position: "absolute",
+  backgroundColor: "transparent",
+  position: "fixed",
   bottom: "10px",
   right: "8px",
   width: "25%",
@@ -33,7 +33,7 @@ const chatboxopened = {
   opacity: 0,
 };
 
-const getRequest = (propsInfo, payloadData = {}) => {
+const getRequestModel = (propsInfo, payloadData = {}) => {
   return {
     channel: propsInfo.channel,
     userUniqueId: cUserUniqueId,
@@ -54,13 +54,13 @@ const callBackendPost = (url_to_call, callback_func, body = "") => {
   req.onreadystatechange = function (aEvt) {
     if (req.readyState == 4) {
       if (req.status == 200) {
+        console.log(">>> Response Body =>", req.responseText);
         let jsn = JSON.parse(req.responseText);
-        console.log("-Response Body =>", jsn);
         callback_func(jsn);
       } else alert("Error loading page\n");
     }
   };
-  console.log("-Request Body =>", body);
+  console.log(">>> Request Body =>", body);
   if (body) req.send(JSON.stringify(body));
   else req.send(body);
 };
@@ -76,15 +76,15 @@ class ChatRoot extends React.Component {
         styleMinimized: chatboxminimized,
         styleMaximized: chatboxopened,
       },
+      screenmsgs:[]
     };
   }
 
   componentDidMount() {
-    var channelVal = this.props.myinput;
     callBackendPost(
       "chatconfig",
       (data) => this.setConfigFromRemote(data),
-      getRequest(this.props)
+      getRequestModel(this.props)
     );
   }
   ////////////////////////////////////////////////
@@ -101,9 +101,32 @@ class ChatRoot extends React.Component {
     }));
   };
 
-  sendMsgToBackend = (message) => {
+  appendToScreenMsgs(from_whom, msg_display){
+    var newelement = {
+      whosemsg: from_whom,
+      data: msg_display
+    }
+
+    this.setState(prevState => ({
+      screenmsgs: [...prevState.screenmsgs, newelement]
+    }))
+
+  }
+
+  sendMsgToBackend = (message) =>  {
+    this.appendToScreenMsgs("client", message);
     console.log("sendMsgToBackend teitklendi", message);
+    callBackendPost(
+      "chatmessage",
+      (data) => this.setServerMessage(data),
+      getRequestModel(this.props, { message: message } )
+    );
+
   };
+  setServerMessage(serverMsg){
+    console.log("setServerMessage teitklendi", serverMsg);
+    this.appendToScreenMsgs("server", serverMsg);
+  }
 
   render() {
     if (this.state.isOpened) {
@@ -111,8 +134,9 @@ class ChatRoot extends React.Component {
         <>
           <ChatWindow
             Configs={this.state.configs}
-            ClickMinize={this.toggleChatWindow}
+            ClickMinimize={this.toggleChatWindow}
             SendMsgFunc={this.sendMsgToBackend}
+            DisplayMsgs={this.state.screenmsgs}
           />
         </>
       );
@@ -171,8 +195,6 @@ class ChatWindow extends React.Component {
   }
 
   render() {
-    console.log("ChatWindow.State durumu:", this.state);
-    console.log("ChatWindow.Props durumu:", this.props);
     return (
       <div style={this.props.Configs.styleMaximized}>
         <table style={styleMainContainer}>
@@ -180,15 +202,13 @@ class ChatWindow extends React.Component {
             <td>
               <ChatWindowTopPart
                 Configs={this.props.Configs}
-                ClickMinize={this.props.ClickMinize}
+                ClickMinimize={this.props.ClickMinimize}
               />
             </td>
           </tr>
           <tr style={styleChildMiddlePart}>
             <td>
-              <div id="middlePart" style={styleDivCommon}>
-                <h1>Middle Part</h1>
-              </div>
+              <ChatWindowMiddlePart DisplayMsgs={this.props.DisplayMsgs} />
             </td>
           </tr>
           <tr style={styleChildBottomPart}>
@@ -225,7 +245,7 @@ class ChatWindowTopPart extends React.Component {
           src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pg0KPCEtLSBVcGxvYWRlZCB0bzogU1ZHIFJlcG8sIHd3dy5zdmdyZXBvLmNvbSwgR2VuZXJhdG9yOiBTVkcgUmVwbyBNaXhlciBUb29scyAtLT4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8c3ZnIGZpbGw9IiMwMDAwMDAiIHZlcnNpb249IjEuMSIgaWQ9IkNhcGFfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgDQoJIHdpZHRoPSI4MDBweCIgaGVpZ2h0PSI4MDBweCIgdmlld0JveD0iMCAwIDQ4MC4yMjEgNDgwLjIyMSINCgkgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8Zz4NCgk8cGF0aCBkPSJNNDgwLjE1OCwyNjAuODc4djE2Ni45NzljMCwyOC44NzQtMjMuNTAxLDUyLjM2My01Mi4zODEsNTIuMzYzSDUyLjQ1M2MtMjguODg5LDAtNTIuMzktMjMuNDg5LTUyLjM5LTUyLjM2M1Y1Mi45MzgNCgkJYzAtMjguODc0LDIzLjUwMS01Mi4zNjksNTIuMzktNTIuMzY5aDE2Ny40MzRjLTkuMDExLDkuMjQ0LTE1LjAwNCwyMS40NS0xNi4zMTYsMzUuMDAzSDUyLjQ0Nw0KCQljLTkuNTgyLDAtMTcuMzc4LDcuNzkxLTE3LjM3OCwxNy4zNjZ2Mzc0LjkyYzAsOS41NjksNy43OTYsMTcuMzYsMTcuMzc4LDE3LjM2aDM3NS4zMjVjOS41ODEsMCwxNy4zNzItNy43OTEsMTcuMzcyLTE3LjM2VjI3Ny4xNjkNCgkJQzQ1OC4zMywyNzUuOTA0LDQ3MC41NiwyNzAuMjM2LDQ4MC4xNTgsMjYwLjg3OHogTTM5OS4yODcsMjMwLjA5NkgyODQuODMxTDQ3MC4wOTksNDQuODI5YzEwLjI0OS0xMC4yNjEsMTAuMjQ5LTI2Ljg4MiwwLTM3LjEzMQ0KCQljLTEwLjI1Ni0xMC4yNjEtMjYuODgzLTEwLjI2MS0zNy4xMzItMC4wMTJMMjQ3LjcsMTkyLjk1OFY3OC40OTdjMC0xNC40OTktMTEuNzU3LTI2LjI2Mi0yNi4yNTktMjYuMjYyDQoJCWMtNy4yNSwwLTEzLjgxNiwyLjkzMi0xOC41NjksNy42ODljLTQuNzUyLDQuNzY1LTcuNjkzLDExLjMyNS03LjY5MywxOC41NzJ2MTc3Ljg1NGMwLDE0LjQ5OSwxMS43NTQsMjYuMjU2LDI2LjI1NiwyNi4yNTZoMTc3Ljg1Mg0KCQljMTQuNTA1LDAsMjYuMjU2LTExLjc1MSwyNi4yNTYtMjYuMjU2UzQxMy43OTIsMjMwLjA5NiwzOTkuMjg3LDIzMC4wOTZ6Ii8+DQo8L2c+DQo8L3N2Zz4="
           alt="Minimize"
           style={styleTopImg}
-          onClick={this.props.ClickMinize}
+          onClick={this.props.ClickMinimize}
         />
       </div>
     );
@@ -249,27 +269,33 @@ class ChatWindowBottomPart extends React.Component {
     this.state = {
       textEntered: "",
     };
-    this.handleChange = this.handleChange.bind(this);
   }
   /////
-  handleChange(event) {
+  handleTextChange = (event) => {
     var tmpVal = event.target.value;
-    console.log("ChatWindowBottomPart.handleChange", tmpVal, event);
-    //this.setState({ textEntered: event.target.value });
     this.setState((state) => ({
       textEntered: tmpVal,
     }));
   }
 
+  handleKeyDown = (event) => {
+    if(event.keyCode == 13 && event.shiftKey == false) {
+      event.preventDefault();
+      this.setState((state) => ({
+        textEntered: "",
+      }));
+      this.props.SendMsgFunc(this.state.textEntered);
+    }
+  }
+
   render() {
     return (
       <div>
-        <textarea
-          id="w3review"
-          name="w3review"
+        <textarea type="text" rows="4" name="body"
           style={styleBottomPartText}
           value={this.state.textEntered}
-          onChange={this.handleChange}
+          onChange={this.handleTextChange}
+          onKeyDown={this.handleKeyDown}
         />
         <img
           alt="Enter"
@@ -278,6 +304,41 @@ class ChatWindowBottomPart extends React.Component {
         />
       </div>
     );
+  }
+}
+
+/////////////////////////////////////////////////////////
+
+const styleMiddlePartMsgAtLeft = {
+  width: "100%",
+  display: "flex",
+  flexDirection: "column",
+  alignContent: "flex-start",
+  backgroundColor:"white",
+  borderRadius: "7px",
+  paddingTop:"2px",
+}
+const styleMiddlePartMsgAtRight = {
+  width: "100%",
+  display: "flex",
+  flexDirection: "column",
+  alignContent: "flex-start",
+  backgroundColor:"green",
+  borderRadius: "7px",
+  paddingTop:"2px",
+}
+
+class ChatWindowMiddlePart extends React.Component {
+  render() {
+    return (
+      <>
+        <div>
+          {this.props.DisplayMsgs.map(d => {
+            if(d.whosemsg == 'client') return <div style={styleMiddlePartMsgAtRight}>{d.data}</div>
+            else if(d.whosemsg == 'server') return <div style={styleMiddlePartMsgAtLeft}>{d.data.Message}</div>
+          })} 
+        </div>
+      </>);
   }
 }
 
